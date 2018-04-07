@@ -1,7 +1,7 @@
 package jp.wasabeef.recyclerview.animators;
 
 /**
- * Copyright (C) 2015 Wasabeef
+ * Copyright (C) 2018 Wasabeef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public class OvershootInLeftAnimator extends BaseItemAnimator {
         .translationX(-holder.itemView.getRootView().getWidth())
         .setDuration(getRemoveDuration())
         .setListener(new DefaultRemoveVpaListener(holder))
+        .setStartDelay(getRemoveDelay(holder))
         .start();
   }
 
@@ -50,6 +51,7 @@ public class OvershootInLeftAnimator extends BaseItemAnimator {
         .setDuration(getAddDuration())
         .setListener(new DefaultAddVpaListener(holder))
         .setInterpolator(new OvershootInterpolator(mTension))
+        .setStartDelay(getAddDelay(holder))
         .start();
   }
 }

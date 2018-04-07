@@ -22,10 +22,10 @@ Please feel free to use this.
 # Demo
 
 ### ItemAnimator
-<img src="art/demo.gif" width="32%"> <img src="art/demo2.gif" width="32%"> <img src="art/demo4.gif" width="32%">
+<img src="art/demo.gif" width="32%"> <img src="art/demo2.gif" width="32%"> <img src="art/demo3.gif" width="32%">
 
 ### Adapters
-![](art/demo3.gif) ![](art/demo5.gif)
+<img src="art/demo4.gif" width="32%"> <img src="art/demo5.gif" width="32%">
 
 # Samples
 
@@ -35,13 +35,22 @@ Please feel free to use this.
 
 ## Setup
 
-Download [the latest JAR](https://search.maven.org/remote_content?g=jp.wasabeef&a=recyclerview-animators&v=LATEST) or grab via Gradle:
-
 #### Gradle
+
+On your module's `build.gradle` file add this compile statement to the `dependencies` section:
+
 ```groovy
 dependencies {
-    // jCenter
-    compile 'jp.wasabeef:recyclerview-animators:1.3.0'
+  compile 'jp.wasabeef:recyclerview-animators:2.3.0'
+}
+```
+
+Also make sure that the `repositories` section includes not only jcenter but also a `maven` section with the `"google()"` endpoint. 
+
+```
+repositories {
+  jcenter()
+  google()
 }
 ```
 
@@ -51,64 +60,104 @@ dependencies {
 Set RecyclerView ItemAnimator.
 
 ```java
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
-    recyclerView.setItemAnimator(new SlideInLeftAnimator());
+RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+recyclerView.setItemAnimator(new SlideInLeftAnimator());
 ```
 
 ```java
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
-    recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f));
+RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+SlideInUpAnimator animator = new SlideInUpAnimator(new OvershootInterpolator(1f));
+recyclerView.setItemAnimator(animator);
 ```
 
-### Advanced Step 2
+## Step 2
+Please use the following  
+`notifyItemChanged(int)`  
+`notifyItemInserted(int)`  
+`notifyItemRemoved(int)`  
+`notifyItemRangeChanged(int, int)`  
+`notifyItemRangeInserted(int, int)`  
+`notifyItemRangeRemoved(int, int)`  
 
-You can change the durations.
+> If you want your animations to work, do not rely on calling `notifyDataSetChanged()`; 
+> as it is the RecyclerView's default behavior, animations are not triggered to start inside this method.
 
 ```java
-    recyclerView.getItemAnimator().setAddDuration(1000);
-    recyclerView.getItemAnimator().setRemoveDuration(1000);
-    recyclerView.getItemAnimator().setMoveDuration(1000);
-    recyclerView.getItemAnimator().setChangeDuration(1000);
+public void remove(int position) {
+  mDataSet.remove(position);
+  notifyItemRemoved(position);
+}
+
+public void add(String text, int position) {
+  mDataSet.add(position, text);
+  notifyItemInserted(position);
+}
 ```
 
 ### Advanced Step 3
 
-By extending AnimateViewHolder, you can override preset animation.   
-So, custom animation can be set depeding on view holder.
+You can change the durations.
 
 ```java
-   static class MyViewHolder extends AnimateViewHolder {
+recyclerView.getItemAnimator().setAddDuration(1000);
+recyclerView.getItemAnimator().setRemoveDuration(1000);
+recyclerView.getItemAnimator().setMoveDuration(1000);
+recyclerView.getItemAnimator().setChangeDuration(1000);
+```
 
-        public MyViewHolder(View itemView) {
-            super(itemView);
-        }
+### Advanced Step 4
 
-        @Override
-        public void animateRemoveImpl(ViewPropertyAnimatorListener listener) {
-            ViewCompat.animate(itemView)
-                    .translationY(-itemView.getHeight() * 0.3f)
-                    .alpha(0)
-                    .setDuration(300)
-                    .setListener(listener)
-                    .start();
-        }
+Change the interpolator.
 
-        @Override
-        public void preAnimateAddImpl() {
-            ViewCompat.setTranslationY(itemView, -itemView.getHeight() * 0.3f);
-            ViewCompat.setAlpha(itemView, 0);
-        }
+```java
+SlideInLeftAnimator animator = new SlideInLeftAnimator();
+animator.setInterpolator(new OvershootInterpolator());
+// or recyclerView.setItemAnimator(new SlideInUpAnimator(new OvershootInterpolator(1f)));
+recyclerView.setItemAnimator(animator);
+```
 
-        @Override
-        public void animateAddImpl(ViewPropertyAnimatorListener listener) {
-            ViewCompat.animate(itemView)
-                    .translationY(0)
-                    .alpha(1)
-                    .setDuration(300)
-                    .setListener(listener)
-                    .start();
-        }
-    }
+### Advanced Step 5
+
+By implementing AnimateViewHolder, you can override preset animation.
+So, custom animation can be set depending on view holder.
+
+```java
+static class MyViewHolder extends RecyclerView.ViewHolder implements AnimateViewHolder {
+  public MyViewHolder(View itemView) {
+    super(itemView);
+  }
+
+  @Override
+  public void preAnimateRemoveImpl(RecyclerView.ViewHolder holder) {
+
+  }
+
+  @Override
+  public void animateRemoveImpl(RecyclerView.ViewHolder holder, ViewPropertyAnimatorListener listener) {
+    ViewCompat.animate(itemView)
+          .translationY(-itemView.getHeight() * 0.3f)
+          .alpha(0)
+          .setDuration(300)
+          .setListener(listener)
+          .start();
+  }
+
+  @Override
+  public void preAnimateAddImpl(RecyclerView.ViewHolder holder) {
+    ViewCompat.setTranslationY(itemView, -itemView.getHeight() * 0.3f);
+    ViewCompat.setAlpha(itemView, 0);
+  }
+
+  @Override
+  public void animateAddImpl(RecyclerView.ViewHolder holder, ViewPropertyAnimatorListener listener) {
+    ViewCompat.animate(itemView)
+          .translationY(0)
+          .alpha(1)
+          .setDuration(300)
+          .setListener(listener)
+          .start();
+  }
+}
 ```
 
 ### Animators
@@ -139,10 +188,9 @@ So, custom animation can be set depeding on view holder.
 Set RecyclerView ItemAnimator.
 
 ```java
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
-    MyAdapter adapter = new MyAdapter();
-    recyclerView.setAdapter(new AlphaInAnimationAdapter(adapter));
-
+RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+MyAdapter adapter = new MyAdapter();
+recyclerView.setAdapter(new AlphaInAnimationAdapter(adapter));
 ```
 
 ### Advanced Step 2
@@ -150,10 +198,10 @@ Set RecyclerView ItemAnimator.
 Change the durations.
 
 ```java
-    MyAdapter adapter = new MyAdapter();
-    AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
-    alphaAdapter.setDuration(1000);
-    recyclerView.setAdapter(alphaAdapter);
+MyAdapter adapter = new MyAdapter();
+AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+alphaAdapter.setDuration(1000);
+recyclerView.setAdapter(alphaAdapter);
 ```
 
 ### Advanced Step 3
@@ -161,10 +209,10 @@ Change the durations.
 Change the interpolator.
 
 ```java
-    MyAdapter adapter = new MyAdapter();
-    AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
-    alphaAdapter.setInterpolator(new OvershootInterpolator());
-    recyclerView.setAdapter(alphaAdapter);
+MyAdapter adapter = new MyAdapter();
+AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+alphaAdapter.setInterpolator(new OvershootInterpolator());
+recyclerView.setAdapter(alphaAdapter);
 ```
 
 ### Advanced Step 4
@@ -172,10 +220,10 @@ Change the interpolator.
 Disable the first scroll mode.
 
 ```java
-    MyAdapter adapter = new MyAdapter();
-    AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
-    scaleAdapter.setFirstOnly(false);
-    recyclerView.setAdapter(alphaAdapter);
+MyAdapter adapter = new MyAdapter();
+AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+alphaAdapter.setFirstOnly(false);
+recyclerView.setAdapter(alphaAdapter);
 ```
 
 ### Advanced Step 5
@@ -183,9 +231,9 @@ Disable the first scroll mode.
 Multiple Animations
 
 ```java
-    MyAdapter adapter = new MyAdapter();
-    AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
-    recyclerView.setAdapter(new ScaleInAnimationAdapter(alphaAdapter));
+MyAdapter adapter = new MyAdapter();
+AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+recyclerView.setAdapter(new ScaleInAnimationAdapter(alphaAdapter));
 ```
 
 ### Adapters
@@ -208,6 +256,8 @@ Please [ping](mailto:dadadada.chop@gmail.com) me or send a pull request if you w
 Icon | Application
 ------------ | -------------
 <img src="https://lh6.ggpht.com/6zKH_uQY1bxCwXL4DLo_uoFEOXdShi3BgmN6XRHlaJ-oA1svmq6y1PZkmO50nWQn2Lg=w300-rw" width="48" height="48" /> | [Ameba Ownd](https://play.google.com/store/apps/details?id=jp.co.cyberagent.madrid)
+<img src="http://quitnowapp.com/xtra/QuitNow!-114.png" width="48" height="48" /> | [QuitNow!](https://play.google.com/store/apps/details?id=com.EAGINsoftware.dejaloYa)
+<img src="https://lh3.googleusercontent.com/ZOrekp-ho-ecWG1TyvuOs0LoB5M4QYWCCLS5lFbAHhp_SklSd06544ENG3uC97zGWes=w300-rw" width="48" height="48" /> | [AbemaTV](https://play.google.com/store/apps/details?id=tv.abema)
 
 Developed By
 -------
@@ -236,7 +286,7 @@ Thanks
 License
 -------
 
-    Copyright 2015 Wasabeef
+    Copyright 2018 Wasabeef
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

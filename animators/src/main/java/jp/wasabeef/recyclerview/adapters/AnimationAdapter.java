@@ -1,4 +1,4 @@
-package jp.wasabeef.recyclerview.animators.adapters;
+package jp.wasabeef.recyclerview.adapters;
 
 import android.animation.Animator;
 import android.support.v7.widget.RecyclerView;
@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import jp.wasabeef.recyclerview.animators.internal.ViewHelper;
+import jp.wasabeef.recyclerview.internal.ViewHelper;
 
 /**
- * Copyright (C) 2015 Wasabeef
+ * Copyright (C) 2018 Wasabeef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,18 +40,54 @@ public abstract class AnimationAdapter extends RecyclerView.Adapter<RecyclerView
     return mAdapter.onCreateViewHolder(parent, viewType);
   }
 
+  @Override public void registerAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
+    super.registerAdapterDataObserver(observer);
+    mAdapter.registerAdapterDataObserver(observer);
+  }
+
+  @Override public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
+    super.unregisterAdapterDataObserver(observer);
+    mAdapter.unregisterAdapterDataObserver(observer);
+  }
+
+  @Override public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    super.onAttachedToRecyclerView(recyclerView);
+    mAdapter.onAttachedToRecyclerView(recyclerView);
+  }
+
+  @Override public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    super.onDetachedFromRecyclerView(recyclerView);
+    mAdapter.onDetachedFromRecyclerView(recyclerView);
+  }
+
+  @Override public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+    super.onViewAttachedToWindow(holder);
+    mAdapter.onViewAttachedToWindow(holder);
+  }
+
+  @Override public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+    super.onViewDetachedFromWindow(holder);
+    mAdapter.onViewDetachedFromWindow(holder);
+  }
+
   @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
     mAdapter.onBindViewHolder(holder, position);
 
-    if (!isFirstOnly || position > mLastPosition) {
+    int adapterPosition = holder.getAdapterPosition();
+    if (!isFirstOnly || adapterPosition > mLastPosition) {
       for (Animator anim : getAnimators(holder.itemView)) {
         anim.setDuration(mDuration).start();
         anim.setInterpolator(mInterpolator);
       }
-      mLastPosition = position;
+      mLastPosition = adapterPosition;
     } else {
       ViewHelper.clear(holder.itemView);
     }
+  }
+
+  @Override public void onViewRecycled(RecyclerView.ViewHolder holder) {
+    mAdapter.onViewRecycled(holder);
+    super.onViewRecycled(holder);
   }
 
   @Override public int getItemCount() {
@@ -82,5 +118,9 @@ public abstract class AnimationAdapter extends RecyclerView.Adapter<RecyclerView
 
   public RecyclerView.Adapter<RecyclerView.ViewHolder> getWrappedAdapter() {
     return mAdapter;
+  }
+
+  @Override public long getItemId(int position) {
+    return mAdapter.getItemId(position);
   }
 }

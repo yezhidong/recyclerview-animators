@@ -1,7 +1,7 @@
 package jp.wasabeef.recyclerview.animators;
 
 /**
- * Copyright (C) 2015 Wasabeef
+ * Copyright (C) 2018 Wasabeef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class FadeInRightAnimator extends BaseItemAnimator {
         .setDuration(getRemoveDuration())
         .setInterpolator(mInterpolator)
         .setListener(new DefaultRemoveVpaListener(holder))
+        .setStartDelay(getRemoveDelay(holder))
         .start();
   }
 
@@ -51,6 +52,7 @@ public class FadeInRightAnimator extends BaseItemAnimator {
         .setDuration(getAddDuration())
         .setInterpolator(mInterpolator)
         .setListener(new DefaultAddVpaListener(holder))
+        .setStartDelay(getAddDelay(holder))
         .start();
   }
 }

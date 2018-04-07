@@ -1,4 +1,4 @@
-package jp.wasabeef.recyclerview.animators.adapters;
+package jp.wasabeef.recyclerview.adapters;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Copyright (C) 2015 Wasabeef
+ * Copyright (C) 2018 Wasabeef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,15 @@ import android.view.View;
  * limitations under the License.
  */
 
-public class AlphaInAnimationAdapter extends AnimationAdapter {
+public class SlideInLeftAnimationAdapter extends AnimationAdapter {
 
-  private static final float DEFAULT_ALPHA_FROM = 0f;
-  private final float mFrom;
-
-  public AlphaInAnimationAdapter(RecyclerView.Adapter adapter) {
-    this(adapter, DEFAULT_ALPHA_FROM);
-  }
-
-  public AlphaInAnimationAdapter(RecyclerView.Adapter adapter, float from) {
+  public SlideInLeftAnimationAdapter(RecyclerView.Adapter adapter) {
     super(adapter);
-    mFrom = from;
   }
 
   @Override protected Animator[] getAnimators(View view) {
-    return new Animator[] { ObjectAnimator.ofFloat(view, "alpha", mFrom, 1f) };
+    return new Animator[] {
+        ObjectAnimator.ofFloat(view, "translationX", -view.getRootView().getWidth(), 0)
+    };
   }
 }
